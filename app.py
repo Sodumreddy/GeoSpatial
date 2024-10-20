@@ -133,50 +133,117 @@ def fetch_pois():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route('/generate_story', methods=['POST'])
-def generate_story():
+# @app.route('/generate_story', methods=['POST'])
+# def generate_story():
+#     try:
+#         data = request.get_json()
+#         print("Received data for story generation:", data)
+
+#         location1_name = data.get('location1')
+#         location2_name = data.get('location2')
+#         mood = data.get('mood', 'adventurous')
+#         preferred_stops = data.get('preferred_stops', ['restaurants', 'motels', 'parks'])
+
+#         if not location1_name or not location2_name:
+#             return jsonify({"error": "Location1 or Location2 is missing"}), 400
+
+#         # Fetch POIs from Overpass API (you might want to check if this function is working correctly)
+#         pois = fetch_pois_from_overpass()
+#         if not pois:
+#             return jsonify({"error": "No points of interest found"}), 400
+
+#         poi_names = [poi['tags'].get('name', 'Unknown POI') for poi in pois]
+#         poi_list = ", ".join(poi_names)
+
+#         # Creating the story prompt
+#         prompt = (f"Create a personalized journey story for a {mood} trip from {location1_name} to {location2_name}. "
+#                   f"The traveler prefers to stop at places like {', '.join(preferred_stops)}. "
+#                   f"Along the way, they will encounter stops like {poi_list}. "
+#                   f"Describe the journey in an exciting way, focusing on these stops and the beauty of the route.")
+
+#         print("Sending prompt to Hugging Face API:", prompt)
+
+#         # Sending the story generation request to Hugging Face
+#         response = query_huggingface({"inputs": prompt})
+#         print("Hugging Face API response:", response)
+
+#         if response and isinstance(response, list) and 'generated_text' in response[0]:
+#             story = response[0]['generated_text']
+#             return jsonify({"story": story, "pois": poi_names})
+#         else:
+#             return jsonify({"error": "Failed to generate story from API response"}), 500
+
+#     except Exception as e:
+#         print(f"Error in generating story: {str(e)}")
+#         return jsonify({"error": str(e)}), 500
+@app.route('/generate_poi_story', methods=['POST'])
+def generate_poi_story():
     try:
         data = request.get_json()
-        print("Received data for story generation:", data)
+        poi_name = data.get('poi_name')
+        poi_category = data.get('poi_category')
 
-        location1_name = data.get('location1')
-        location2_name = data.get('location2')
-        mood = data.get('mood', 'adventurous')
-        preferred_stops = data.get('preferred_stops', ['restaurants', 'motels', 'parks'])
+        if not poi_name or not poi_category:
+            return jsonify({"error": "Missing POI information"}), 400
 
-        if not location1_name or not location2_name:
-            return jsonify({"error": "Location1 or Location2 is missing"}), 400
-
-        # Fetch POIs from Overpass API (you might want to check if this function is working correctly)
-        pois = fetch_pois_from_overpass()
-        if not pois:
-            return jsonify({"error": "No points of interest found"}), 400
-
-        poi_names = [poi['tags'].get('name', 'Unknown POI') for poi in pois]
-        poi_list = ", ".join(poi_names)
-
-        # Creating the story prompt
-        prompt = (f"Create a personalized journey story for a {mood} trip from {location1_name} to {location2_name}. "
-                  f"The traveler prefers to stop at places like {', '.join(preferred_stops)}. "
-                  f"Along the way, they will encounter stops like {poi_list}. "
-                  f"Describe the journey in an exciting way, focusing on these stops and the beauty of the route.")
-
-        print("Sending prompt to Hugging Face API:", prompt)
-
-        # Sending the story generation request to Hugging Face
+        # Create a story prompt based on the POI
+        prompt = create_poi_story_prompt(poi_name, poi_category)
+        
+        # Generate story using Hugging Face API
         response = query_huggingface({"inputs": prompt})
-        print("Hugging Face API response:", response)
-
+        
         if response and isinstance(response, list) and 'generated_text' in response[0]:
             story = response[0]['generated_text']
-            return jsonify({"story": story, "pois": poi_names})
+            # Clean and format the story
+            formatted_story = format_story(story)
+            return jsonify({"story": formatted_story}), 200
         else:
-            return jsonify({"error": "Failed to generate story from API response"}), 500
+            return jsonify({"error": "Failed to generate story"}), 500
 
     except Exception as e:
-        print(f"Error in generating story: {str(e)}")
+        print(f"Error generating POI story: {str(e)}")
         return jsonify({"error": str(e)}), 500
-
+def create_poi_story_prompt(poi_name, poi_category):
+    """Create an engaging prompt for the story generation based on POI type"""
+    category_prompts = {
+        'restaurant': f"Tell a short story about a memorable dining experience at {poi_name}, "
+                     f"describing the atmosphere, signature dishes, and what makes it special.",
+        'hotel': f"Describe a perfect stay at {poi_name}, highlighting its unique features "
+                f"and what travelers might experience there.",
+        'motel': f"Share an interesting traveler's tale about staying at {poi_name}, "
+                f"focusing on its character and memorable aspects.",
+        'park': f"Paint a picture of a beautiful day spent at {poi_name}, "
+                f"describing its natural features and activities visitors can enjoy."
+    }
+    
+    default_prompt = f"Tell an interesting story about visiting {poi_name}, "f"describing what makes this {poi_category} special and memorable."
+    return category_prompts.get(poi_category.lower(), default_prompt)
+def format_story(story):
+    """
+    Clean and format the generated story text
+    
+    Args:
+        story (str): Raw story text from the API
+        
+    Returns:
+        str: Formatted story with HTML paragraph tags
+    """
+    # Remove any extra whitespace and newlines
+    story = ' '.join(story.split())
+    
+    # Add paragraph breaks for readability (every 3 sentences)
+    sentences = story.split('. ')
+    paragraphs = []
+    current_paragraph = []
+    
+    for i, sentence in enumerate(sentences):
+        current_paragraph.append(sentence)
+        if (i + 1) % 3 == 0 or i == len(sentences) - 1:
+            paragraphs.append('. '.join(current_paragraph) + '.')
+            current_paragraph = []
+    
+    return '<p>' + '</p><p>'.join(paragraphs) + '</p>'
+    
 @app.route('/fetch_routes', methods=['POST'])
 def fetch_routes():
     try:
@@ -277,3 +344,4 @@ def get_heatmap_data():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
