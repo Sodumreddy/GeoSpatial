@@ -132,6 +132,8 @@ def fetch_pois():
         print("Error in /fetch_pois:", str(e))
         return jsonify({"error": str(e)}), 500
 
+
+
 @app.route('/generate_poi_story', methods=['POST'])
 def generate_poi_story():
     try:

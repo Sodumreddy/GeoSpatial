@@ -188,47 +188,6 @@ async function fetchRoutes(payload) {
         console.error("Error:", error);
     }
 }
-// async function fetchAndDisplayHeatMap(sourceCoords, destinationCoords) {
-//     try {
-//         const response = await fetch('/fetch_pois', {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json'
-//             },
-//             body: JSON.stringify({
-//                 source: sourceCoords,
-//                 destination: destinationCoords,
-//                 proximity_km: 10  // Limit search area to within 10 kilometers of the route
-//             })
-//         });
-
-//         if (!response.ok) {
-//             throw new Error(`Failed to fetch POIs: ${response.statusText}`);
-//         }
-
-//         const data = await response.json();
-//         if (data.pois && data.pois.length > 0) {
-//             const heatPoints = data.pois.map(poi => [poi.location.lat, poi.location.lon]);
-
-//             // Clear existing heatmap layer and markers if they exist
-//             if (heatmapLayer) {
-//                 map.removeLayer(heatmapLayer);
-//             }
-
-//             heatmapLayer = L.heatLayer(heatPoints, { radius: 25 }).addTo(map);
-
-//             data.pois.forEach(poi => {
-//                 L.marker([poi.location.lat, poi.location.lon])
-//                     .addTo(map)
-//                     .bindPopup(`${poi.name} (${poi.category})`);
-//             });
-//         } else {
-//             console.error('No POIs found');
-//         }
-//     } catch (error) {
-//         console.error('Error fetching POIs:', error);
-//     }
-// }
 async function fetchAndDisplayHeatMap(sourceCoords, destinationCoords) {
     try {
         const response = await fetch('/fetch_pois', {
