@@ -132,50 +132,6 @@ def fetch_pois():
         print("Error in /fetch_pois:", str(e))
         return jsonify({"error": str(e)}), 500
 
-
-# @app.route('/generate_story', methods=['POST'])
-# def generate_story():
-#     try:
-#         data = request.get_json()
-#         print("Received data for story generation:", data)
-
-#         location1_name = data.get('location1')
-#         location2_name = data.get('location2')
-#         mood = data.get('mood', 'adventurous')
-#         preferred_stops = data.get('preferred_stops', ['restaurants', 'motels', 'parks'])
-
-#         if not location1_name or not location2_name:
-#             return jsonify({"error": "Location1 or Location2 is missing"}), 400
-
-#         # Fetch POIs from Overpass API (you might want to check if this function is working correctly)
-#         pois = fetch_pois_from_overpass()
-#         if not pois:
-#             return jsonify({"error": "No points of interest found"}), 400
-
-#         poi_names = [poi['tags'].get('name', 'Unknown POI') for poi in pois]
-#         poi_list = ", ".join(poi_names)
-
-#         # Creating the story prompt
-#         prompt = (f"Create a personalized journey story for a {mood} trip from {location1_name} to {location2_name}. "
-#                   f"The traveler prefers to stop at places like {', '.join(preferred_stops)}. "
-#                   f"Along the way, they will encounter stops like {poi_list}. "
-#                   f"Describe the journey in an exciting way, focusing on these stops and the beauty of the route.")
-
-#         print("Sending prompt to Hugging Face API:", prompt)
-
-#         # Sending the story generation request to Hugging Face
-#         response = query_huggingface({"inputs": prompt})
-#         print("Hugging Face API response:", response)
-
-#         if response and isinstance(response, list) and 'generated_text' in response[0]:
-#             story = response[0]['generated_text']
-#             return jsonify({"story": story, "pois": poi_names})
-#         else:
-#             return jsonify({"error": "Failed to generate story from API response"}), 500
-
-#     except Exception as e:
-#         print(f"Error in generating story: {str(e)}")
-#         return jsonify({"error": str(e)}), 500
 @app.route('/generate_poi_story', methods=['POST'])
 def generate_poi_story():
     try:
@@ -344,4 +300,3 @@ def get_heatmap_data():
 
 if __name__ == '__main__':
     app.run(debug=True)
-

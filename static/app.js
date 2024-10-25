@@ -293,34 +293,6 @@ async function fetchAndDisplayHeatMap(sourceCoords, destinationCoords) {
         console.error('Error fetching POIs:', error);
     }
 }
-
-
-
-// async function generateStory(payload) {
-//     try {
-//         const response = await fetch('/generate_story', {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json'
-//             },
-//             body: JSON.stringify(payload)
-//         });
-
-//         if (!response.ok) {
-//             throw new Error(`Failed to generate story: ${response.statusText}`);
-//         }
-
-//         const data = await response.json();
-//         if (data && data.story) {
-//             document.getElementById('story').innerText = data.story;
-//         } else {
-//             console.error('Error generating story:', data.error);
-//         }
-//     } catch (error) {
-//         console.error("Error generating story:", error);
-//         document.getElementById('story').innerText = "An error occurred while generating the story.";
-//     }
-// }
 async function generatePoiStory(poiName, poiCategory) {
     try {
         const storyResponse = await fetch('/generate_poi_story', {

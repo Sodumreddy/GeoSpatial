@@ -5,28 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Journey Narratives</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <!-- <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script> -->
     <style>
+        /* Styling the map container */
         #map {
             height: 600px;
             margin-top: 20px;
+            z-index: 1; /* Lower z-index so other elements can stay above */
+            position: relative;
         }
-        #story, #distance {
+
+        /* Styling for the story section */
+        #story {
+            margin-top: 20px;
+            font-size: 1.2em;
+            background-color: #fff;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            z-index: 10; /* Higher z-index to stay above the map */
+            position: relative;
+        }
+
+        /* Styling for the distance section */
+        #distance {
             margin-top: 20px;
             font-size: 1.2em;
         }
-        /* #story {
-            white-space: pre-wrap; 
-        } */
-        #story {
-    font-size: 1.2em;
-    padding: 10px;
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
 
+        /* Ensuring the layout has some breathing space */
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
     </style>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
@@ -54,20 +72,21 @@
         <input type="checkbox" id="parks" value="parks" checked> Parks<br>
         
         <button type="submit">Get Heat Map & Story</button>
-        
     </form>
-    <!-- <div id="map" style="height: 500px; width: 100%;"></div> -->
-    <!-- <div id="story"></div> -->
-    <!-- <div id="distance">Distance will appear here...</div> -->
-    <!-- <div id="story">Story will appear here...</div> -->
-    <!-- <div id="map"></div> -->
+
+    <!-- Section for displaying the distance -->
     <div id="distance">Distance will appear here...</div>
-    <div id="story"style="margin-top: 20px;">Story will appear here...</div>
-    <div id="map" style="height: 500px; width: 100%;"></div>
+
+    <!-- Section for displaying the generated story -->
+    <div id="story">Story will appear here...</div>
+
+    <!-- Map container -->
+    <div id="map"></div>
+
+    <!-- Load Leaflet.js and heatmap plugin -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+    <!-- Link to your app.js file -->
     <script src="/static/app.js"></script>
-    <!-- <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap" async defer></script> -->
-
 </body>
 </html>
